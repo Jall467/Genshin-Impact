@@ -122,7 +122,7 @@ int main() {
     //    printf("%d %.16lf\n", a, pro[a]);
     //}
     //printf("\n");
-    double exp = 0.0;
+    //double exp = 0.0;
     //for (int a = 1; a <= 180; a++) {
     //    exp = exp + a * pro[a];
     //}
