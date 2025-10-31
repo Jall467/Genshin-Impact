@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<string.h>
+#include<math.h>
 const int num1 = 90;
 const int num2 = 80;
 const double nup1 = 0.5;
@@ -143,12 +144,11 @@ int main() {
 			guazhleijin[b] = upleijinwai(b, guangzhuifive_pos, 1);
 		}
 	}//初始化本抽和累进概率列表
-	const int num_chars = 3;
-	const int num_guang = 1;
+	const int num_chars = 7;
+	const int num_guang = 5;
 	const int max_numch = num_chars * 180;
 	const int max_numgu = num_guang * 160;
-	double dchar[num_chars + 1][max_numch + 1];
-	memset(dchar, 0, sizeof(dchar));
+	double dchar[num_chars + 1][max_numch + 1] = { 0.0 };
 	dchar[0][0] = 1.0;
 	for (int i = 1; i <= num_chars; i++) {
 		for (int j = 0; j <= max_numch; j++) {
@@ -161,8 +161,7 @@ int main() {
 			}
 		}
 	}
-	double dguan[num_guang + 1][max_numgu + 1];
-	memset(dguan, 0, sizeof(dguan));
+	double dguan[num_guang + 1][max_numgu + 1] = { 0.0 };
 	dguan[0][0] = 1.0;
 	for (int i = 1; i <= num_guang; i++) {
 		for (int j = 0; j <= max_numgu; j++) {
@@ -203,6 +202,13 @@ int main() {
 	for (int i = 0; i <= max_numch + max_numgu; i++) {
 		leijintotalprob[i + 1] = leijintotalprob[i] + totalprob[i + 1];
 	}
+	double exp = 0.0;double var = 0.0;
+	for (int i = 0; i <= max_numch + max_numgu; i++) {
+		exp += i * totalprob[i];
+	}
+	for (int i = 0; i <= max_numch + max_numgu; i++) {
+		var += pow((i - exp),2) * totalprob[i];
+	}
 	//printf("characters:\n");
 	//for (int i = 1; i <= max_numch; i++) {
 	//	printf("%d:%.50lf\n", i, xinhun[i]);
@@ -217,9 +223,13 @@ int main() {
 	//}
 	printf("total:\n");
 	for (int k = 1; k <= max_numch + max_numgu; k++) {
-		printf("%d:%.50lf\n", k, totalprob[k]);
-		printf("%.50lf\n", leijintotalprob[k]);
-		printf("\n");
+		printf("%d %.50lf\n", k, totalprob[k]);
 	}
+	printf("\n");
+	for (int k = 1; k <= max_numch + max_numgu; k++) {
+		printf("%d %.50lf\n", k, leijintotalprob[k]);
+	}
+	printf("expectation:%lf\n", exp);
+	printf("Var:%lf\n", var);
 	return 0;
 }
