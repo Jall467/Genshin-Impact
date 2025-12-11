@@ -1,7 +1,7 @@
 #include<stdio.h> 
 #include<stdlib.h>           //原神、崩坏星穹铁道、绝区零等游戏抽卡概率模型完全破解代码。
 #include<math.h>
-#define GAME 1               //0代表原神，1代表星穹铁道，2代表绝区零，3代表鸣潮
+#define GAME 0              //0代表原神，1代表星穹铁道，2代表绝区零，3代表鸣潮
 #define NUM_CHAR 7           //角色数目
 #define NUM_GEAR 5           //武器数目(这里将角色使用的用来攻击的物品统一称为武器)
 #define GENSHIN_IMPACT 0
@@ -290,10 +290,10 @@ int main() {
 	printf("Var:%lf\n", var);                                        //方差
 	printf("Standard Deviation:%lf\n", sqrt(var));                   //标准差
 	printf("average possibility:%lf\n", 1.0 / exp);                  //平均概率
-	printf("%lf %lf\n", exp - 1 * sqrt(var), exp + 1 * sqrt(var));   //1倍σ范围
-	printf("%lf %lf\n", exp - 2 * sqrt(var), exp + 2 * sqrt(var));   //2倍σ范围
-	printf("%lf %lf\n", exp - 3 * sqrt(var), exp + 3 * sqrt(var));   //3倍σ范围
-	if (exp - 1 * sqrt(var)>0 && exp + 1 * sqrt(var) < max_numch + max_numge) {      //计算σ，2σ和3σ区间的概率值，辅助判断是否可使用正态分布近似拟合
+    printf("1sigma:(%lf,%lf)\n", exp - 1 * sqrt(var), exp + 1 * sqrt(var));   //1倍σ范围
+    printf("2sigma:(%lf,%lf)\n", exp - 2 * sqrt(var), exp + 2 * sqrt(var));   //2倍σ范围
+    printf("3sigma:(%lf,%lf)\n", exp - 3 * sqrt(var), exp + 3 * sqrt(var));   //3倍σ范围
+	if (exp - 1 * sqrt(var) > 0 && exp + 1 * sqrt(var) < max_numch + max_numge) {       //计算σ，2σ和3σ区间的概率值，辅助判断是否可使用正态分布近似拟合
 		judge1 = true;                                                                //参考：标准正态分布1σ概率值为68.26%，2σ为95.44%，3σ为99.74%
 		for (int i = int(exp - 1 * sqrt(var)); i <= int(exp + 1 * sqrt(var)); i++) {
 			p1 += total_prob[i];
