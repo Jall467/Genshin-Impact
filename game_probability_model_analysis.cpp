@@ -2,7 +2,7 @@
 #include<stdlib.h>           //原神、崩坏星穹铁道、绝区零等游戏抽卡概率模型完全破解代码。
 #include<math.h>
 #define GAME 1               //0代表原神，1代表星穹铁道，2代表绝区零，3代表鸣潮
-#define NUM_CHAR 0           //角色数目
+#define NUM_CHAR 7           //角色数目
 #define NUM_GEAR 5           //武器数目(这里将角色使用的用来攻击的物品统一称为武器)
 #define GENSHIN_IMPACT 0
 #define HONGKAI_STARRAIL 1
