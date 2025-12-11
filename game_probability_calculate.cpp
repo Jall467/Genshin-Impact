@@ -1,13 +1,13 @@
-#include<stdio.h>
-#include<stdlib.h>        //原神、崩坏星穹铁道、绝区零等游戏抽卡概率模型完全破解代码。
+#include<stdio.h> 
+#include<stdlib.h>           //原神、崩坏星穹铁道、绝区零等游戏抽卡概率模型完全破解代码。
 #include<math.h>
+#define GAME 1               //0代表原神，1代表星穹铁道，2代表绝区零，3代表鸣潮
+#define NUM_CHAR 0           //角色数目
+#define NUM_GEAR 5           //武器数目(这里将角色使用的用来攻击的物品统一称为武器)
 #define GENSHIN_IMPACT 0
 #define HONGKAI_STARRAIL 1
 #define ZENLESS_ZONEZERO 2
 #define WUTHERING_WAVES 3
-#define GAME 3               //0代表原神，1代表星穹铁道，2代表绝区零，3代表鸣潮
-#define NUM_CHAR 0           //角色数目
-#define NUM_GEAR 1           //武器数目(这里将角色使用的用来攻击的物品统一称为武器)
 typedef struct {
 	int pity_count;     //保底抽数
 	double base_rate;   //基础概率
@@ -19,10 +19,14 @@ typedef struct {
 	Banner character;   //角色池
 	Banner gear;        //武器池
 }game;
-const game genshin = { "Genshin_Impact",{90,0.006,0.5,0.5},{80,0.007,0.375,0.625} };
-const game starrail = { "Hongkai_Starrail",{90,0.006,0.5,0.5},{80,0.008,0.75,0.25} };
-const game zenless = { "Zenless_Zonezero",{90,0.006,0.5,0.5},{80,0.01,0.75,0.25} };
-const game wuthering = { "Wuthering_Waves",{80,0.008,0.5,0.5},{80,0.008,1.0,0.0}};
+const game g[4] = { { "Genshin_Impact",{90,0.006,0.5,0.5},{80,0.007,0.375,0.625} },
+	{ "Hongkai_Starrail",{90,0.006,0.5,0.5},{80,0.008,0.75,0.25} },
+	{ "Zenless_Zonezero",{90,0.006,0.5,0.5},{80,0.01,0.75,0.25} },
+	{ "Wuthering_Waves",{80,0.008,0.5,0.5},{80,0.008,1.0,0.0}} };
+void Genshin_Impact(double* char_pos_arr, double* gear_pos_arr);
+void Hongkai_Starrail(double* char_pos_arr, double* gear_pos_arr);
+void Zenless_Zonezero(double* char_pos_arr, double* gear_pos_arr);
+void Wuthering_Waves(double* char_pos_arr, double* gear_pos_arr);
 double benchou(int n, double* p) {
 	double mult = 1.0;
 	if (n == 1) {
@@ -36,9 +40,9 @@ double benchou(int n, double* p) {
 	}
 	return mult;
 }
-double upwai(int n, double* p, int num,double up_pos) {//计算歪过一次再出UP的情况的总概率
-	double proba = 0.0;                                //c,d为控制变量,c控制游戏，d控制角色池或武器池，c的取值只有0,1,2,3，d的取值只有0,1
-	double nup = 1.0 - up_pos;                         //c的值0对应原神，1对应崩坏星穹铁道，2对应绝区零，3对应鸣潮；d的值0对应角色池，1对应武器池
+double upwai(int n, double* p, int num, double up_pos) {//计算歪过一次再出UP的情况的总概率
+	double proba = 0.0;                               
+	double nup = 1.0 - up_pos;                         
 	if (n >= 2 && n <= num) {
 		for (int k = 1; k <= n - 1; k++) {
 			proba += benchou(k, p) * nup * benchou(n - k, p);
@@ -53,7 +57,29 @@ double upwai(int n, double* p, int num,double up_pos) {//计算歪过一次再�
 	}
 	return proba;
 }
-void Genshin_Impact(double* char_pos_arr,double* gear_pos_arr) {
+void game_select(int i, int& charnum, double& charfiveup, int& gearnum, double& gearfiveup, double* char_pos_arr, double* gear_pos_arr) {
+	charnum = g[i].character.pity_count; charfiveup = g[i].character.up_rate;
+	gearnum = g[i].gear.pity_count; gearfiveup = g[i].gear.up_rate;
+	switch (i)
+	{
+	case GENSHIN_IMPACT:
+		Genshin_Impact(char_pos_arr, gear_pos_arr);
+		break;
+	case HONGKAI_STARRAIL:
+		Hongkai_Starrail(char_pos_arr, gear_pos_arr);
+		break;
+	case ZENLESS_ZONEZERO:
+		Zenless_Zonezero(char_pos_arr, gear_pos_arr);
+		break;
+	case WUTHERING_WAVES:
+		Wuthering_Waves(char_pos_arr, gear_pos_arr);
+		break;
+	default:
+		printf("输入的i值不合法！\n");
+		break;
+	}
+}
+void Genshin_Impact(double* char_pos_arr, double* gear_pos_arr) {
 	for (int i = 1; i <= 73; i++) {
 		char_pos_arr[i] = 0.006;
 	}
@@ -71,7 +97,7 @@ void Genshin_Impact(double* char_pos_arr,double* gear_pos_arr) {
 		gear_pos_arr[i] = 1.00;
 	}
 }
-void Hongkai_Starrail(double* char_pos_arr,double* gear_pos_arr) {
+void Hongkai_Starrail(double* char_pos_arr, double* gear_pos_arr) {
 	for (int i = 1; i <= 73; i++) {
 		char_pos_arr[i] = 0.006;
 	}
@@ -90,7 +116,7 @@ void Hongkai_Starrail(double* char_pos_arr,double* gear_pos_arr) {
 	}
 	gear_pos_arr[80] = 1.00;
 }
-void Zenless_Zonezero(double* char_pos_arr,double* gear_pos_arr) {
+void Zenless_Zonezero(double* char_pos_arr, double* gear_pos_arr) {
 	for (int i = 1; i <= 73; i++) {
 		char_pos_arr[i] = 0.006;
 	}
@@ -139,32 +165,9 @@ int main() {
 	int flag = GAME;
 	int char_num; int gear_num;
 	double char_five_up; double gear_five_up;
-	if (flag == GENSHIN_IMPACT) {
-		Genshin_Impact(charfive_pos, gearfive_pos);
-		char_num = genshin.character.pity_count; char_five_up = genshin.character.up_rate;
-		gear_num = genshin.gear.pity_count; gear_five_up = genshin.gear.up_rate;
-	}
-	else if (flag == HONGKAI_STARRAIL) {
-		Hongkai_Starrail(charfive_pos, gearfive_pos);
-		char_num = starrail.character.pity_count; char_five_up = starrail.character.up_rate;
-		gear_num = starrail.gear.pity_count; gear_five_up = starrail.gear.up_rate;
-	}
-	else if (flag == ZENLESS_ZONEZERO) {
-		Zenless_Zonezero(charfive_pos, gearfive_pos);
-		char_num = zenless.character.pity_count; char_five_up = zenless.character.up_rate;
-		gear_num = zenless.gear.pity_count; gear_five_up = zenless.gear.up_rate;
-	}
-	else if (flag == WUTHERING_WAVES) {
-		Wuthering_Waves(charfive_pos, gearfive_pos);
-		char_num = wuthering.character.pity_count; char_five_up = wuthering.character.up_rate;
-		gear_num = wuthering.gear.pity_count; gear_five_up = wuthering.gear.up_rate;
-	}
-	else {
-		printf("不合法的GAME值！\n");
-		return 0;
-	}
-	double* char_up_pos = (double*)calloc(2 * char_num + 1 , sizeof(double));
-	double* gear_up_pos = (double*)calloc(2 * gear_num + 1 , sizeof(double));
+	game_select(flag, char_num, char_five_up, gear_num, gear_five_up, charfive_pos, gearfive_pos);
+	double* char_up_pos = (double*)calloc(2 * char_num + 1, sizeof(double));
+	double* gear_up_pos = (double*)calloc(2 * gear_num + 1, sizeof(double));
 	for (int a = 1; a <= 2 * char_num; a++) {
 		if (a == 1) {
 			char_up_pos[a] = benchou(a, charfive_pos) * char_five_up;
@@ -176,12 +179,12 @@ int main() {
 			char_up_pos[a] = upwai(a, charfive_pos, char_num, char_five_up);
 		}
 	}
-	for (int a = 1; a <= 2 * gear_num ; a++) {
+	for (int a = 1; a <= 2 * gear_num; a++) {
 		if (a == 1) {
 			gear_up_pos[a] = benchou(a, gearfive_pos) * gear_five_up;
 		}
 		else if (a >= 2 && a <= gear_num) {
-			gear_up_pos[a] = benchou(a, gearfive_pos) * gear_five_up + upwai(a, gearfive_pos, gear_num,gear_five_up);
+			gear_up_pos[a] = benchou(a, gearfive_pos) * gear_five_up + upwai(a, gearfive_pos, gear_num, gear_five_up);
 		}
 		else if (a > gear_num && a <= 2 * gear_num) {
 			gear_up_pos[a] = upwai(a, gearfive_pos, gear_num, gear_five_up);
@@ -196,7 +199,7 @@ int main() {
 		dchar[i] = (double*)calloc(max_numch + 1, sizeof(double));
 	}
 	dchar[0][0] = 1.0;
-	if (num_chars != 0) {
+	if (num_chars > 0) {
 		for (int i = 1; i <= num_chars; i++) {
 			for (int j = 0; j <= max_numch; j++) {
 				if (dchar[i - 1][j] > 0) {
@@ -214,7 +217,7 @@ int main() {
 		dgear[i] = (double*)calloc(max_numge + 1, sizeof(double));
 	};
 	dgear[0][0] = 1.0;
-	if (num_gears != 0) {
+	if (num_gears > 0) {
 		for (int i = 1; i <= num_gears; i++) {
 			for (int j = 0; j <= max_numge; j++) {
 				if (dgear[i - 1][j] > 0) {
@@ -255,25 +258,25 @@ int main() {
 	for (int i = 0; i < max_numch + max_numge; i++) {
 		cum_total_prob[i + 1] = cum_total_prob[i] + total_prob[i + 1];
 	}
-	double exp = 0.0;double var = 0.0;
+	double exp = 0.0; double var = 0.0;
 	for (int i = 0; i <= max_numch + max_numge; i++) {
 		exp += i * total_prob[i];
 	}
 	for (int i = 0; i <= max_numch + max_numge; i++) {
-		var += pow((i - exp),2) * total_prob[i];
+		var += pow((i - exp), 2) * total_prob[i];
 	}
-	//printf("characters:\n");
-	//for (int i = 1; i <= max_numch; i++) {
-	//	printf("%d:%.13lf\n", i, xinhun[i]);
-	//	printf("%.13lf\n", leijinxinhun[i]);
-	//	printf("\n");
-	//}
-	//printf("light core:\n");
-	//for (int j = 1; j <= max_numgu; j++) {
-	//	printf("%d:%.13lf\n", j, dieyin[j]);
-	//	printf("%.13lf\n", leijindieyin[j]);
-	//	printf("\n");
-	//}
+	/*printf("characters:\n");
+	for (int i = 1; i <= max_numch; i++) {
+		printf("%d:%.13lf\n", i, xinhun[i]);
+		printf("%.13lf\n", leijinxinhun[i]);
+		printf("\n");
+	}
+	printf("gear:\n");
+	for (int j = 1; j <= max_numgu; j++) {
+		printf("%d:%.13lf\n", j, dieyin[j]);
+		printf("%.13lf\n", leijindieyin[j]);
+		printf("\n");
+	}*/
 	printf("total:\n");
 	for (int k = 1; k <= max_numch + max_numge; k++) {
 		printf("%d %.20lf\n", k, total_prob[k]);
@@ -282,13 +285,45 @@ int main() {
 	for (int k = 1; k <= max_numch + max_numge; k++) {
 		printf("%d %.20lf\n", k, cum_total_prob[k]);
 	}
-	printf("expectation:%lf\n", exp);//期望
-	printf("Var:%lf\n", var);//方差
-	printf("Standard Deviation:%lf\n", sqrt(var));//标准差
-	printf("average possibility:%lf\n",1.0/exp);//平均概率
-	printf("%lf %lf\n", exp - 1 * sqrt(var), exp + 1 * sqrt(var));//1倍σ范围
-	printf("%lf %lf\n", exp - 2 * sqrt(var), exp + 2 * sqrt(var));//2倍σ范围
-	printf("%lf %lf\n", exp - 3 * sqrt(var), exp + 3 * sqrt(var));//3倍σ范围
+	double p1 = 0.0, p2 = 0.0, p3 = 0.0; bool judge1=false,judge2=false,judge3 = false;
+	printf("expectation:%lf\n", exp);                                //期望
+	printf("Var:%lf\n", var);                                        //方差
+	printf("Standard Deviation:%lf\n", sqrt(var));                   //标准差
+	printf("average possibility:%lf\n", 1.0 / exp);                  //平均概率
+	printf("%lf %lf\n", exp - 1 * sqrt(var), exp + 1 * sqrt(var));   //1倍σ范围
+	printf("%lf %lf\n", exp - 2 * sqrt(var), exp + 2 * sqrt(var));   //2倍σ范围
+	printf("%lf %lf\n", exp - 3 * sqrt(var), exp + 3 * sqrt(var));   //3倍σ范围
+	if (exp - 1 * sqrt(var)>0 && exp + 1 * sqrt(var) < max_numch + max_numge) {      //计算σ，2σ和3σ区间的概率值，辅助判断是否可使用正态分布近似拟合
+		judge1 = true;                                                                //参考：标准正态分布1σ概率值为68.26%，2σ为95.44%，3σ为99.74%
+		for (int i = int(exp - 1 * sqrt(var)); i <= int(exp + 1 * sqrt(var)); i++) {
+			p1 += total_prob[i];
+		}
+	}
+	else {
+		printf("illegal sigma value.\n");
+	}
+	if (exp - 2 * sqrt(var) > 0 && exp + 2 * sqrt(var) < max_numch + max_numge) {
+		judge2 = true;
+		for (int i = int(exp - 2 * sqrt(var)); i <= int(exp + 2 * sqrt(var)); i++) {
+			p2 += total_prob[i];
+		}
+	}
+	else {
+		printf("illegal sigma value.\n");
+	}
+	if (exp - 3 * sqrt(var) > 0 && exp + 3 * sqrt(var) < max_numch + max_numge) {
+		judge3 = true;
+		for (int i = int(exp - 3 * sqrt(var)); i <= int(exp + 3 * sqrt(var)); i++) {
+			p3 += total_prob[i];
+		}
+	}
+	else {
+		printf("illegal sigma value.\n");
+	}
+	if (judge1 && judge2 && judge3) {
+		printf("1sigma:%lf 2sigma:%lf 3sigma:%lf\n", p1, p2, p3);
+		printf("reference value:1sigma,0.6826;2sigma,0.9544;3sigma,0.9974\n");
+	}
 	free(char_up_pos);
 	free(gear_up_pos);
 	for (int i = 0; i < num_chars + 1; i++) {
