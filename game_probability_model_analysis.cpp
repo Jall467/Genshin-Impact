@@ -253,7 +253,7 @@ int main() {
 				total_prob[i + j] += char_prob_dist[i] * gear_prob_dist[j];
 			}
 		}
-	}//由角色和光锥各自概率累加计算总共的概率
+	}//由角色和武器各自概率计算卷积概率
 	double* cum_total_prob = (double*)calloc(max_numch + max_numge + 1, sizeof(double));
 	for (int i = 0; i < max_numch + max_numge; i++) {
 		cum_total_prob[i + 1] = cum_total_prob[i] + total_prob[i + 1];
