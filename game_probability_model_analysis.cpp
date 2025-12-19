@@ -267,14 +267,14 @@ int main() {
 	}
 	/*printf("characters:\n");
 	for (int i = 1; i <= max_numch; i++) {
-		printf("%d:%.13lf\n", i, xinhun[i]);
-		printf("%.13lf\n", leijinxinhun[i]);
+		printf("%d:%.13lf\n", i, char_prob_dist[i]);
+		printf("%.13lf\n", cum_char_prob[i]);
 		printf("\n");
 	}
 	printf("gear:\n");
 	for (int j = 1; j <= max_numgu; j++) {
-		printf("%d:%.13lf\n", j, dieyin[j]);
-		printf("%.13lf\n", leijindieyin[j]);
+		printf("%d:%.13lf\n", j, gear_prob_dist[j]);
+		printf("%.13lf\n", cum_gear_prob[j]);
 		printf("\n");
 	}*/
 	printf("total:\n");
@@ -300,7 +300,7 @@ int main() {
 		}
 	}
 	else {
-		printf("illegal sigma value.\n");
+		printf("illegal 1sigma value.\n");
 	}
 	if (exp - 2 * sqrt(var) > 0 && exp + 2 * sqrt(var) < max_numch + max_numge) {
 		judge2 = true;
@@ -309,7 +309,7 @@ int main() {
 		}
 	}
 	else {
-		printf("illegal sigma value.\n");
+		printf("illegal 2sigma value.\n");
 	}
 	if (exp - 3 * sqrt(var) > 0 && exp + 3 * sqrt(var) < max_numch + max_numge) {
 		judge3 = true;
@@ -318,7 +318,7 @@ int main() {
 		}
 	}
 	else {
-		printf("illegal sigma value.\n");
+		printf("illegal 3sigma value.\n");
 	}
 	if (judge1 && judge2 && judge3) {
 		printf("1sigma:%lf 2sigma:%lf 3sigma:%lf\n", p1, p2, p3);
