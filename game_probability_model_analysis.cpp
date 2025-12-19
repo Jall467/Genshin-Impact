@@ -28,17 +28,19 @@ void Hongkai_Starrail(double* char_pos_arr, double* gear_pos_arr);
 void Zenless_Zonezero(double* char_pos_arr, double* gear_pos_arr);
 void Wuthering_Waves(double* char_pos_arr, double* gear_pos_arr);
 double benchou(int n, double* p) {
-	double mult = 1.0;
-	if (n == 1) {
-		mult = p[n];
-	}
-	for (int k = 1; k < n; k++) {
-		mult *= (1 - p[k]);
-		if (k == n - 1) {
-			mult *= p[n];
-		}
-	}
-	return mult;
+    double mult = 1.0;
+    if (n == 1) {
+        mult = p[n];
+    }
+    else {
+        for (int k = 1; k < n; k++) {
+            mult *= (1 - p[k]);
+            if (k == n - 1) {
+                mult *= p[n];
+            }
+        }
+    }
+    return mult;
 }
 double upwai(int n, double* p, int num, double up_pos) {//计算歪过一次再出UP的情况的总概率
 	double proba = 0.0;                               
