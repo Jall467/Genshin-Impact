@@ -1,7 +1,7 @@
 #include<stdio.h> 
 #include<stdlib.h>           //原神、崩坏星穹铁道、绝区零等游戏抽卡概率模型完全破解代码。
 #include<math.h>
-#define GAME 0              //0代表原神，1代表星穹铁道，2代表绝区零，3代表鸣潮
+#define GAME 0               //0代表原神，1代表星穹铁道，2代表绝区零，3代表鸣潮
 #define NUM_CHAR 7           //角色数目
 #define NUM_GEAR 5           //武器数目(这里将角色使用的用来攻击的物品统一称为武器)
 #define GENSHIN_IMPACT 0
@@ -272,18 +272,18 @@ int main() {
 		printf("\n");
 	}
 	printf("gear:\n");
-	for (int j = 1; j <= max_numgu; j++) {
+	for (int j = 1; j <= max_numge; j++) {
 		printf("%d:%.13lf\n", j, gear_prob_dist[j]);
 		printf("%.13lf\n", cum_gear_prob[j]);
 		printf("\n");
 	}*/
 	printf("total:\n");
 	for (int k = 1; k <= max_numch + max_numge; k++) {
-		printf("%d %.20lf\n", k, total_prob[k]);
+		printf("%d | %.20lf\n", k, total_prob[k]);
 	}
 	printf("\n");
 	for (int k = 1; k <= max_numch + max_numge; k++) {
-		printf("%d %.20lf\n", k, cum_total_prob[k]);
+		printf("%d | %.20lf\n", k, cum_total_prob[k]);
 	}
 	double p1 = 0.0, p2 = 0.0, p3 = 0.0; bool judge1=false,judge2=false,judge3 = false;
 	printf("expectation:%lf\n", exp);                                //期望
@@ -294,7 +294,7 @@ int main() {
     printf("2sigma:(%lf,%lf)\n", exp - 2 * sqrt(var), exp + 2 * sqrt(var));   //2倍σ范围
     printf("3sigma:(%lf,%lf)\n", exp - 3 * sqrt(var), exp + 3 * sqrt(var));   //3倍σ范围
 	if (exp - 1 * sqrt(var) > 0 && exp + 1 * sqrt(var) < max_numch + max_numge) {       //计算σ，2σ和3σ区间的概率值，辅助判断是否可使用正态分布近似拟合
-		judge1 = true;                                                                //参考：标准正态分布1σ概率值为68.26%，2σ为95.44%，3σ为99.74%
+		judge1 = true;                                                                  //参考：标准正态分布1σ概率值为68.26%，2σ为95.44%，3σ为99.74%
 		for (int i = int(exp - 1 * sqrt(var)); i <= int(exp + 1 * sqrt(var)); i++) {
 			p1 += total_prob[i];
 		}
