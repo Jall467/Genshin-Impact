@@ -77,7 +77,7 @@ void game_select(int i, int& charnum, double& charfiveup, int& gearnum, double& 
 		Wuthering_Waves(char_pos_arr, gear_pos_arr);
 		break;
 	default:
-		printf("输入的i值不合法！\n");
+		printf("输入的GAME值不合法！\n");
 		break;
 	}
 }
