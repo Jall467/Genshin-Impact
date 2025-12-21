@@ -1,10 +1,10 @@
 #include<stdio.h> 
 #include<stdlib.h>           //原神、崩坏星穹铁道、绝区零等游戏抽卡概率模型完全破解代码。
-#include<math.h>             //程序说明：在第5行和第6行的NUM_CHAR与NUM_GEAR处输入抽取的目标角色数和武器数目(满命或满魂是7个不是6个)，运行程序会自动打印输出抽数概率分布列和成功率
+#include<math.h>             //程序使用说明：在第5行和第6行的NUM_CHAR与NUM_GEAR处输入抽取的目标角色数和武器数目(满命或满魂是7个不是6个)，运行程序会自动打印输出抽数概率分布列和成功率
 #define GAME 0               //0代表原神，1代表星穹铁道，2代表绝区零，3代表鸣潮
 #define NUM_CHAR 7           //角色数目
 #define NUM_GEAR 5           //武器数目(这里将角色使用的用来攻击的物品统一称为武器)
-#define GENSHIN_IMPACT 0
+#define GENSHIN_IMPACT 0     
 #define HONGKAI_STARRAIL 1
 #define ZENLESS_ZONEZERO 2
 #define WUTHERING_WAVES 3
@@ -269,23 +269,24 @@ int main() {
 	}
 	/*printf("characters:\n");
 	for (int i = 1; i <= max_numch; i++) {
-		printf("%d:%.13lf\n", i, char_prob_dist[i]);
-		printf("%.13lf\n", cum_char_prob[i]);
+		printf("%d:%.13e\n", i, char_prob_dist[i]);
+		printf("%.13e\n", cum_char_prob[i]);
 		printf("\n");
 	}
 	printf("gear:\n");
 	for (int j = 1; j <= max_numge; j++) {
-		printf("%d:%.13lf\n", j, gear_prob_dist[j]);
-		printf("%.13lf\n", cum_gear_prob[j]);
+		printf("%d:%.13e\n", j, gear_prob_dist[j]);
+		printf("%.13e\n", cum_gear_prob[j]);
 		printf("\n");
 	}*/
 	printf("total:\n");
+	printf("possibility distribution:\n\n");
 	for (int k = 1; k <= max_numch + max_numge; k++) {
-		printf("%d | %.20lf\n", k, total_prob[k]);
+		printf("%d | %.13e\n", k, total_prob[k]);
 	}
 	printf("\n");
 	for (int k = 1; k <= max_numch + max_numge; k++) {
-		printf("%d | %.20lf\n", k, cum_total_prob[k]);
+		printf("%d | %.13e\n", k, cum_total_prob[k]);
 	}
 	double p1 = 0.0, p2 = 0.0, p3 = 0.0; bool judge1=false,judge2=false,judge3 = false;
 	printf("expectation:%lf\n", exp);                                //期望
