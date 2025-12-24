@@ -5,6 +5,7 @@
 #define HONGKAI_STARRAIL 1   //运行程序会自动打印输出抽数概率分布列和成功率
 #define ZENLESS_ZONEZERO 2
 #define WUTHERING_WAVES 3
+/*需要打印中文字符，请选择支持中文字符的编译器与环境，否则请使用另一个英文版本*/
 typedef struct {
 	int pity_count;     //保底抽数
 	double base_rate;   //基础概率
