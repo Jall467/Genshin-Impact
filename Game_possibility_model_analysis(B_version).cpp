@@ -163,7 +163,7 @@ int main() {
 	double charfive_pos[91]; double gearfive_pos[81];
 	printf("enter number to select game,0:Genshin_Impact,1:Hongkai_Starrail,2:Zenless_Zonezero,3:Wuthering_Waves\n");
 	int flag;
-  scanf("%d",&flag);
+    scanf("%d",&flag);
 	int char_num; int gear_num;int num_char,num_gear;
 	printf("enter goal number of characters and gears,use single space to separate(a character's full constellations or full eidolons has 7, not 6.)\n");
 	scanf("%d %d",&num_char,&num_gear);
