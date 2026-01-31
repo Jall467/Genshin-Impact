@@ -20,7 +20,7 @@ typedef struct {
 	Banner gear;        //武器池
 }game;
 const game g[4] = { { "Genshin_Impact",{90,0.006,0.5,0.5},{80,0.007,0.375,0.625} },
-	{ "Hongkai_Starrail",{90,0.006,0.5,0.5},{80,0.008,0.75,0.25} },
+	{ "Hongkai_Starrail",{90,0.006,0.5625,0.4375},{80,0.008,0.78125,0.21875} },//崩铁角色池实际不歪概率为56.25%，光锥池实际不歪概率为78.125%
 	{ "Zenless_Zonezero",{90,0.006,0.5,0.5},{80,0.01,0.75,0.25} },
 	{ "Wuthering_Waves",{80,0.008,0.5,0.5},{80,0.008,1.0,0.0}} };
 void Genshin_Impact(double* char_pos_arr, double* gear_pos_arr);
