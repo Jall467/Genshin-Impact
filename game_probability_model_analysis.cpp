@@ -1,9 +1,9 @@
 #include<stdio.h> 
 #include<malloc.h>           //原神、崩坏星穹铁道、绝区零等游戏抽卡模型完全破解代码。
-#include<math.h>             //程序说明：在第5行和第6行的NUM_CHAR与NUM_GEAR处输入抽取的目标角色数和武器数目(满命或满魂是7个不是6个)，运行程序会自动打印输出抽数概率分布列和成功率
-#define GAME 4               //0为原神，1为星穹铁道，2为绝区零，3为鸣潮，4为重返未来1999
+#include<math.h>             //程序说明：在第在第5行和第6行的NUM_CHAR与NUM_GEAR处输入抽取的目标角色数和武器数目(满命或满魂是7个不是6个)，运行程序会自动打印输出抽数概率分布列和成功率
+#define GAME 0               //0为原神，1为星穹铁道，2为绝区零，3为鸣潮，4为重返未来1999
 #define NUM_CHAR 0           //角色数目
-#define NUM_GEAR 1           //武器数目(这里将角色使用的用来攻击的物品统一称为武器)，注意重返未来1999无武器池
+#define NUM_GEAR 0           //武器数目(这里将角色使用的用来攻击的物品统一称为武器)，注意重返未来1999无武器池
 #define GENSHIN_IMPACT 0
 #define HONGKAI_STARRAIL 1
 #define ZENLESS_ZONEZERO 2
@@ -268,6 +268,7 @@ int main() {
 	for (int i = 0; i <= max_numch + max_numge; i++) {
 		var += pow((i - exp), 2) * total_prob[i];
 	}
+	printf("game selected:%s\n", g[GAME].name);
 	/*printf("characters:\n");
 	for (int i = 1; i <= max_numch; i++) {
 		printf("%d:%.13e\n", i, char_prob_dist[i]);
