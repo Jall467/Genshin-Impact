@@ -1,14 +1,15 @@
 #include<stdio.h> 
 #include<malloc.h>           //原神、崩坏星穹铁道、绝区零等游戏抽卡模型完全破解代码。
-#include<math.h>             //程序说明：第4行选择你玩的游戏，第5行和第6行的NUM_CHAR与NUM_GEAR处输入抽取的目标角色数和武器数目(满命或满魂是7个不是6个)，运行程序会自动打印输出抽数概率分布列和成功率
-#define GAME 0               //0为原神，1为星穹铁道，2为绝区零，3为鸣潮，4为重返未来1999
+#include<math.h>             //程序说明：在第5行和第6行的NUM_CHAR与NUM_GEAR处输入抽取的目标角色数和武器数目(满命或满魂是7个不是6个)，运行程序会自动打印输出抽数概率分布列和成功率
+#define GAME 0               //0为原神，1为星穹铁道，2为绝区零，3为鸣潮，4为少女前线2，5为重返未来1999
 #define NUM_CHAR 0           //角色数目
 #define NUM_GEAR 0           //武器数目(这里将角色使用的用来攻击的物品统一称为武器)，注意重返未来1999无武器池
 #define GENSHIN_IMPACT 0
 #define HONGKAI_STARRAIL 1
 #define ZENLESS_ZONEZERO 2
 #define WUTHERING_WAVES 3
-#define REVERSE1999 4
+#define GIRLS_FRONTLINE2_EXILIUM 4
+#define REVERSE1999 5
 typedef struct {
 	int pity_count;     //保底抽数
 	double base_rate;   //基础概率
@@ -24,11 +25,13 @@ const Game g[6] = { { "Genshin_Impact",{90,0.006,0.5,0.5},{80,0.007,0.75,0.25} }
 	{ "Hongkai_Starrail",{90,0.006,0.5625,0.4375},{80,0.008,0.78125,0.21875} },//崩铁角色池实际不歪概率为56.25%，光锥池实际不歪概率为78.125%
 	{ "Zenless_Zonezero",{90,0.006,0.5,0.5},{80,0.01,0.75,0.25} },
 	{ "Wuthering_Waves",{80,0.008,0.5,0.5},{80,0.008,1.0,0.0}},
+	{ "Girls_frontline2_exilium",{80,0.006,0.5,0.5},{80,0.007,0.75,0.25}},
 	{ "Reverse1999",{70,0.015,0.5,0.5},{0,0.0,0.0,0.0} } };         //重返未来1999无武器池
 void Genshin_Impact(double* char_pos_arr, double* gear_pos_arr);
 void Hongkai_Starrail(double* char_pos_arr, double* gear_pos_arr);
 void Zenless_Zonezero(double* char_pos_arr, double* gear_pos_arr);
 void Wuthering_Waves(double* char_pos_arr, double* gear_pos_arr);
+void Girls_frontline2_exilium(double* char_pos_arr, double* gear_pos_arr);
 void Reverse1999(double* char_pos_arr, double* gear_pos_arr);
 double benchou(int n, double* p) {
 	if (n < 1) return 0.0;
@@ -66,6 +69,8 @@ void game_select(int i, double* char_pos_arr, double* gear_pos_arr) {
 		Zenless_Zonezero(char_pos_arr, gear_pos_arr); break;
 	case WUTHERING_WAVES:
 		Wuthering_Waves(char_pos_arr, gear_pos_arr); break;
+	case GIRLS_FRONTLINE2_EXILIUM:
+		Girls_frontline2_exilium(char_pos_arr, gear_pos_arr); break;
 	case REVERSE1999:
 		Reverse1999(char_pos_arr, gear_pos_arr); break;
 	default:
@@ -153,6 +158,22 @@ void Wuthering_Waves(double* char_pos_arr, double* gear_pos_arr) {
 	}
 	gear_pos_arr[79] = 1.00; gear_pos_arr[80] = 1.0;
 }
+void Girls_frontline2_exilium(double* char_pos_arr, double* gear_pos_arr) {
+	for (int i = 1; i <= 58; i++) {
+		char_pos_arr[i] = 0.006;
+	}
+	for (int i = 59; i <= 79; i++) {
+		char_pos_arr[i] = 0.006 + 0.047 * (i - 58);
+	}
+	char_pos_arr[80] = 1.00;
+	for (int i = 1; i <= 58; i++) {
+		gear_pos_arr[i] = 0.007;
+	}
+	for (int i = 59; i <= 76; i++) {
+		gear_pos_arr[i] = 0.007 + 0.053 * (i - 58);
+	}
+	gear_pos_arr[77] = 1.00;
+}
 void Reverse1999(double* char_pos_arr, double* gear_pos_arr) {
 	for (int i = 1; i <= 60; i++) {
 		char_pos_arr[i] = 0.015;
@@ -167,6 +188,10 @@ void Reverse1999(double* char_pos_arr, double* gear_pos_arr) {
 }
 int main() {
 	double charfive_pos[91]; double gearfive_pos[81];
+	if (!(GAME == 0 || GAME == 1 || GAME == 2 || GAME == 3 || GAME == 4 || GAME == 5)) {
+		printf("illegal GAME value! Please enter correct GAME value!");
+		return 0;
+	}
 	Game game = g[GAME];
 	game_select(GAME,charfive_pos, gearfive_pos);
 	double* char_up_pos = (double*)calloc(2 * game.character.pity_count + 1, sizeof(double));
@@ -256,7 +281,7 @@ int main() {
 				total_prob[i + j] += char_prob_dist[i] * gear_prob_dist[j];
 			}
 		}
-	}//由角色和武器各自概率计算卷积概率
+	}//由角色和武器各自的概率分布概率计算总的卷积概率分布
 	double* cum_total_prob = (double*)calloc(max_numch + max_numge + 1, sizeof(double));
 	for (int i = 0; i < max_numch + max_numge; i++) {
 		cum_total_prob[i + 1] = cum_total_prob[i] + total_prob[i + 1];
@@ -283,11 +308,11 @@ int main() {
 	}*/
 	printf("total:\n");
 	for (int k = 1; k <= max_numch + max_numge; k++) {
-		printf("%d | %e\n", k, total_prob[k]);
+		printf("%d | %g\n", k, total_prob[k]);
 	}
 	printf("\n");
 	for (int k = 1; k <= max_numch + max_numge; k++) {
-		printf("%d | %e\n", k, cum_total_prob[k]);
+		printf("%d | %g\n", k, cum_total_prob[k]);
 	}
 	printf("---------------\nimportant points:\n");
 	for (int i = 1; i <= max_numch + max_numge; i++) {
