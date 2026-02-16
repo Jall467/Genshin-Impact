@@ -2,7 +2,7 @@
 #include<malloc.h>           //原神、崩坏星穹铁道、绝区零等游戏抽卡模型完全破解代码。
 #include<math.h>             //程序说明：在第5行和第6行的NUM_CHAR与NUM_GEAR处输入抽取的目标角色数和武器数目(满命或满魂是7个不是6个)，运行程序会自动打印输出抽数概率分布列和成功率
 #define GAME 0               //0为原神，1为星穹铁道，2为绝区零，3为鸣潮，4为少女前线2，5为重返未来1999
-#define NUM_CHAR 0           //角色数目
+#define NUM_CHAR 1           //角色数目
 #define NUM_GEAR 0           //武器数目(这里将角色使用的用来攻击的物品统一称为武器)，注意重返未来1999无武器池
 #define GENSHIN_IMPACT 0
 #define HONGKAI_STARRAIL 1
@@ -21,7 +21,8 @@ typedef struct {
 	Banner character;   //角色池
 	Banner gear;        //武器池
 }Game;
-const Game g[6] = { { "Genshin_Impact",{90,0.006,0.5,0.5},{80,0.007,0.75,0.25} },
+const Game g[6] = { 
+	{ "Genshin_Impact",{90,0.006,0.5,0.5},{80,0.007,0.375,0.625} },
 	{ "Hongkai_Starrail",{90,0.006,0.5625,0.4375},{80,0.008,0.78125,0.21875} },//崩铁角色池实际不歪概率为56.25%，光锥池实际不歪概率为78.125%
 	{ "Zenless_Zonezero",{90,0.006,0.5,0.5},{80,0.01,0.75,0.25} },
 	{ "Wuthering_Waves",{80,0.008,0.5,0.5},{80,0.008,1.0,0.0}},
@@ -41,18 +42,18 @@ double benchou(int n, double* p) {
 	}
 	return mult * p[n];
 }
-double upwai(int n, double* p, int num, double up_pos) {//计算歪过一次再出UP的情况的总概率
+double upwai(int n, double* ben, int num, double up_pos) {//计算歪过一次再出UP的情况的总概率
 	double proba = 0.0;
 	double nup = 1.0 - up_pos;
 	if (n >= 2 && n <= num) {
 		for (int k = 1; k <= n - 1; k++) {
-			proba += benchou(k, p) * nup * benchou(n - k, p);
+			proba += ben[k] * nup * ben[n - k];
 		}
 	}
 	else if (n > num && n <= 2 * num) {
 		for (int k = 1; k <= num; k++) {
 			if (n - k <= num) {
-				proba += benchou(k, p) * nup * benchou(n - k, p);
+				proba += ben[k] * nup * ben[n - k];
 			}
 		}
 	}
@@ -187,7 +188,7 @@ void Reverse1999(double* char_pos_arr, double* gear_pos_arr) {
 	}
 }
 int main() {
-	double charfive_pos[91]; double gearfive_pos[81];
+	double charfive_pos[91] = { 0.0 }; double gearfive_pos[81] = { 0.0 };
 	if (!(GAME == 0 || GAME == 1 || GAME == 2 || GAME == 3 || GAME == 4 || GAME == 5)) {
 		printf("illegal GAME value! Please enter correct GAME value!");
 		return 0;
@@ -196,26 +197,33 @@ int main() {
 	game_select(GAME,charfive_pos, gearfive_pos);
 	double* char_up_pos = (double*)calloc(2 * game.character.pity_count + 1, sizeof(double));
 	double* gear_up_pos = (double*)calloc(2 * game.gear.pity_count + 1, sizeof(double));
+	double char_ben[91] = { 0.0 }; double gear_ben[81] = { 0.0 };
+	for (int i = 1; i <= game.character.pity_count; i++) {
+		char_ben[i] = benchou(i, charfive_pos);
+	}
+	for (int i = 1; i <= game.gear.pity_count; i++) {
+		gear_ben[i] = benchou(i, gearfive_pos);
+	}
 	for (int a = 1; a <= 2 * game.character.pity_count; a++) {
 		if (a == 1) {
-			char_up_pos[a] = benchou(a, charfive_pos) * game.character.up_rate;
+			char_up_pos[a] = char_ben[a] * game.character.up_rate;
 		}
 		else if (a >= 2 && a <= game.character.pity_count) {
-			char_up_pos[a] = benchou(a, charfive_pos) * game.character.up_rate + upwai(a, charfive_pos, game.character.pity_count, game.character.up_rate);
+			char_up_pos[a] = char_ben[a] * game.character.up_rate + upwai(a, char_ben, game.character.pity_count, game.character.up_rate);
 		}
 		else if (a > game.character.pity_count && a <= 2 * game.character.pity_count) {
-			char_up_pos[a] = upwai(a, charfive_pos, game.character.pity_count, game.character.up_rate);
+			char_up_pos[a] = upwai(a, char_ben, game.character.pity_count, game.character.up_rate);
 		}
 	}
 	for (int a = 1; a <= 2 * game.gear.pity_count; a++) {
 		if (a == 1) {
-			gear_up_pos[a] = benchou(a, gearfive_pos) * game.gear.up_rate;
+			gear_up_pos[a] = gear_ben[a] * game.gear.up_rate;
 		}
 		else if (a >= 2 && a <= game.gear.pity_count) {
-			gear_up_pos[a] = benchou(a, gearfive_pos) * game.gear.up_rate + upwai(a, gearfive_pos, game.gear.pity_count, game.gear.up_rate);
+			gear_up_pos[a] = gear_ben[a] * game.gear.up_rate + upwai(a, gear_ben, game.gear.pity_count, game.gear.up_rate);
 		}
 		else if (a > game.gear.pity_count && a <= 2 * game.gear.pity_count) {
-			gear_up_pos[a] = upwai(a, gearfive_pos, game.gear.pity_count, game.gear.up_rate);
+			gear_up_pos[a] = upwai(a, gear_ben, game.gear.pity_count, game.gear.up_rate);
 		}
 	}
 	const int num_chars = NUM_CHAR;
@@ -294,6 +302,8 @@ int main() {
 		var += pow((i - exp), 2) * total_prob[i];
 	}
 	printf("game selected:%s\n", g[GAME].name);
+	printf("your targeted gacha goal:\n");
+	printf("character number:%d,gear number:%d\n",num_chars,num_gears);
 	/*printf("characters:\n");
 	for (int i = 1; i <= max_numch; i++) {
 		printf("%d:%.13e\n", i, char_prob_dist[i]);
@@ -372,6 +382,12 @@ int main() {
 	for (int i = 1; i <= max_numch + max_numge; i++) {
 		if (cum_total_prob[i] >= 0.8) {
 			printf("80%% at:%d\n", i);
+			break;
+		}
+	}
+	for (int i = 1; i <= max_numch + max_numge; i++) {
+		if (cum_total_prob[i] >= 0.85) {
+			printf("85%% at:%d\n", i);
 			break;
 		}
 	}
