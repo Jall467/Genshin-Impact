@@ -10,6 +10,7 @@
 #define WUTHERING_WAVES 3
 #define GIRLS_FRONTLINE2_EXILIUM 4
 #define REVERSE1999 5
+#define NEVERNESS_TO_EVERNESS 6
 typedef struct {
 	int pity_count;     //保底抽数
 	double base_rate;   //基础概率
@@ -21,19 +22,21 @@ typedef struct {
 	Banner character;   //角色池
 	Banner gear;        //武器池
 }Game;
-const Game g[6] = { 
+const Game g[7] = { 
 	{ "Genshin_Impact",{90,0.006,0.5,0.5},{80,0.007,0.375,0.625} },
 	{ "Hongkai_Starrail",{90,0.006,0.5625,0.4375},{80,0.008,0.78125,0.21875} },//崩铁角色池实际不歪概率为56.25%，光锥池实际不歪概率为78.125%
 	{ "Zenless_Zonezero",{90,0.006,0.5,0.5},{80,0.01,0.75,0.25} },
 	{ "Wuthering_Waves",{80,0.008,0.5,0.5},{80,0.008,1.0,0.0}},
 	{ "Girls_frontline2_exilium",{80,0.006,0.5,0.5},{80,0.007,0.75,0.25}},
-	{ "Reverse1999",{70,0.015,0.5,0.5},{0,0.0,0.0,0.0} } };         //重返未来1999无武器池
+	{ "Reverse1999",{70,0.015,0.5,0.5},{0,0.0,0.0,0.0}},
+	{ "Neverness_to_everness",{90,0.0099,1.0,0.0},{0,0.0,0.0,0.0} } };         //重返未来1999无武器池
 void Genshin_Impact(double* char_pos_arr, double* gear_pos_arr);
 void Hongkai_Starrail(double* char_pos_arr, double* gear_pos_arr);
 void Zenless_Zonezero(double* char_pos_arr, double* gear_pos_arr);
 void Wuthering_Waves(double* char_pos_arr, double* gear_pos_arr);
 void Girls_frontline2_exilium(double* char_pos_arr, double* gear_pos_arr);
 void Reverse1999(double* char_pos_arr, double* gear_pos_arr);
+void Neverness_to_everness(double* char_pos_arr, double* gear_pos_arr);
 double benchou(int n, double* p) {
 	if (n < 1) return 0.0;
 	double mult = 1.0;
@@ -74,6 +77,8 @@ void game_select(int i, double* char_pos_arr, double* gear_pos_arr) {
 		Girls_frontline2_exilium(char_pos_arr, gear_pos_arr); break;
 	case REVERSE1999:
 		Reverse1999(char_pos_arr, gear_pos_arr); break;
+	case NEVERNESS_TO_EVERNESS:
+		Neverness_to_everness(char_pos_arr, gear_pos_arr); break;
 	default:
 		printf("illegal GAME value!\n"); break;
 	}
@@ -187,10 +192,26 @@ void Reverse1999(double* char_pos_arr, double* gear_pos_arr) {
 		gear_pos_arr[i] = 0.00;
 	}
 }
+void Neverness_to_everness(double* char_pos_arr, double* gear_pos_arr) {
+	for (int i = 1; i <= 70; i++) {
+		char_pos_arr[i] = 0.0099;
+	}
+	for (int i = 71; i <= 89; i++) {
+		char_pos_arr[i] = 0.1959;
+	}
+	char_pos_arr[90] = 1.00;
+	for (int i = 1; i <= 80; i++) {
+		gear_pos_arr[i] = 0.0;
+	}
+}
 int main() {
 	double charfive_pos[91] = { 0.0 }; double gearfive_pos[81] = { 0.0 };
-	if (!(GAME == 0 || GAME == 1 || GAME == 2 || GAME == 3 || GAME == 4 || GAME == 5)) {
-		printf("illegal GAME value! Please enter correct GAME value!");
+	if (!(GAME == 0 || GAME == 1 || GAME == 2 || GAME == 3 || GAME == 4 || GAME == 5 || GAME ==6)) {
+		printf("illegal GAME value! Please enter correct GAME value!\n");
+		return 0;
+	}
+	if ((GAME == 5 && NUM_GEAR != 0) || (GAME == 6 && NUM_GEAR != 0)) {
+		printf("ilegal gear num value,please enter correct value!\n");
 		return 0;
 	}
 	Game game = g[GAME];
@@ -228,8 +249,11 @@ int main() {
 	}
 	const int num_chars = NUM_CHAR;
 	const int num_gears = NUM_GEAR;
-	const int max_numch = num_chars * 2 * game.character.pity_count;
-	const int max_numge = num_gears * 2 * game.gear.pity_count;
+	int max_numch = num_chars * 2 * game.character.pity_count;
+	int max_numge = num_gears * 2 * game.gear.pity_count;
+	if (GAME == NEVERNESS_TO_EVERNESS) max_numch = NUM_CHAR * 90;
+	if (GAME == WUTHERING_WAVES) max_numge = NUM_GEAR * 90;
+	if (GAME == REVERSE1999) max_numge = 0;
 	double** dchar = (double**)calloc(num_chars + 1, sizeof(double*));
 	for (int i = 0; i < num_chars + 1; i++) {
 		dchar[i] = (double*)calloc(max_numch + 1, sizeof(double));
@@ -306,14 +330,14 @@ int main() {
 	printf("character number:%d,gear number:%d\n",num_chars,num_gears);
 	/*printf("characters:\n");
 	for (int i = 1; i <= max_numch; i++) {
-		printf("%d:%.13e\n", i, char_prob_dist[i]);
-		printf("%.13e\n", cum_char_prob[i]);
+		printf("%d | %g\n", i, char_prob_dist[i]);
+		printf("%g\n", cum_char_prob[i]);
 		printf("\n");
 	}
 	printf("gears:\n");
 	for (int j = 1; j <= max_numge; j++) {
-		printf("%d:%.13e\n", j, gear_prob_dist[j]);
-		printf("%.13e\n", cum_gear_prob[j]);
+		printf("%d | %g\n", j, gear_prob_dist[j]);
+		printf("%g\n", cum_gear_prob[j]);
 		printf("\n");
 	}*/
 	printf("total:\n");
