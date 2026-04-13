@@ -1,7 +1,8 @@
-#include<stdio.h> 
+#include<stdio.h>
+#include<iostream>
 #include<malloc.h>           //原神、崩坏星穹铁道、绝区零等游戏抽卡模型完全破解代码。
 #include<math.h>             //程序说明：在第5行和第6行的NUM_CHAR与NUM_GEAR处输入抽取的目标角色数和武器数目(满命或满魂是7个不是6个)，运行程序会自动打印输出抽数概率分布列和成功率
-#define GAME 0               //0为原神，1为星穹铁道，2为绝区零，3为鸣潮，4为少女前线2，5为重返未来1999
+#define GAME 0               //0为原神，1为星穹铁道，2为绝区零，3为鸣潮，4为少女前线2，5为重返未来1999，6为异环
 #define NUM_CHAR 1           //角色数目
 #define NUM_GEAR 0           //武器数目(这里将角色使用的用来攻击的物品统一称为武器)，注意重返未来1999无武器池
 #define GENSHIN_IMPACT 0
@@ -22,14 +23,14 @@ typedef struct {
 	Banner character;   //角色池
 	Banner gear;        //武器池
 }Game;
-const Game g[7] = { 
+const Game g[7] = {
 	{ "Genshin_Impact",{90,0.006,0.5,0.5},{80,0.007,0.375,0.625} },
 	{ "Hongkai_Starrail",{90,0.006,0.5625,0.4375},{80,0.008,0.78125,0.21875} },//崩铁角色池实际不歪概率为56.25%，光锥池实际不歪概率为78.125%
 	{ "Zenless_Zonezero",{90,0.006,0.5,0.5},{80,0.01,0.75,0.25} },
 	{ "Wuthering_Waves",{80,0.008,0.5,0.5},{80,0.008,1.0,0.0}},
 	{ "Girls_frontline2_exilium",{80,0.006,0.5,0.5},{80,0.007,0.75,0.25}},
-	{ "Reverse1999",{70,0.015,0.5,0.5},{0,0.0,0.0,0.0}},
-	{ "Neverness_to_everness",{90,0.0099,1.0,0.0},{0,0.0,0.0,0.0} } };         //重返未来1999无武器池
+	{ "Reverse1999",{70,0.015,0.5,0.5},{0,0.0,0.0,0.0}},//重返未来1999无武器池
+	{ "Neverness_to_everness",{90,0.0099,1.0,0.0},{0,0.0,0.0,0.0} } };
 void Genshin_Impact(double* char_pos_arr, double* gear_pos_arr);
 void Hongkai_Starrail(double* char_pos_arr, double* gear_pos_arr);
 void Zenless_Zonezero(double* char_pos_arr, double* gear_pos_arr);
@@ -37,6 +38,10 @@ void Wuthering_Waves(double* char_pos_arr, double* gear_pos_arr);
 void Girls_frontline2_exilium(double* char_pos_arr, double* gear_pos_arr);
 void Reverse1999(double* char_pos_arr, double* gear_pos_arr);
 void Neverness_to_everness(double* char_pos_arr, double* gear_pos_arr);
+template<class T>
+int length(T& a) {
+	return sizeof(a) / sizeof(a[0]);
+}
 double benchou(int n, double* p) {
 	if (n < 1) return 0.0;
 	double mult = 1.0;
@@ -206,7 +211,7 @@ void Neverness_to_everness(double* char_pos_arr, double* gear_pos_arr) {
 }
 int main() {
 	double charfive_pos[91] = { 0.0 }; double gearfive_pos[81] = { 0.0 };
-	if (!(GAME == 0 || GAME == 1 || GAME == 2 || GAME == 3 || GAME == 4 || GAME == 5 || GAME ==6)) {
+	if (!(GAME == 0 || GAME == 1 || GAME == 2 || GAME == 3 || GAME == 4 || GAME == 5 || GAME == 6)) {
 		printf("illegal GAME value! Please enter correct GAME value!\n");
 		return 0;
 	}
@@ -215,15 +220,17 @@ int main() {
 		return 0;
 	}
 	Game game = g[GAME];
-	game_select(GAME,charfive_pos, gearfive_pos);
+	game_select(GAME, charfive_pos, gearfive_pos);
 	double* char_up_pos = (double*)calloc(2 * game.character.pity_count + 1, sizeof(double));
 	double* gear_up_pos = (double*)calloc(2 * game.gear.pity_count + 1, sizeof(double));
-	double char_ben[91] = { 0.0 }; double gear_ben[81] = { 0.0 };
+	double char_ben[91] = { 0.0 }; double gear_ben[81] = { 0.0 }; double char_cum[91] = { 0.0 }; double gear_cum[81] = { 0.0 };
 	for (int i = 1; i <= game.character.pity_count; i++) {
 		char_ben[i] = benchou(i, charfive_pos);
+		char_cum[i] = char_cum[i - 1] + char_ben[i];
 	}
 	for (int i = 1; i <= game.gear.pity_count; i++) {
 		gear_ben[i] = benchou(i, gearfive_pos);
+		gear_cum[i] = gear_cum[i - 1] + gear_ben[i];
 	}
 	for (int a = 1; a <= 2 * game.character.pity_count; a++) {
 		if (a == 1) {
@@ -247,6 +254,10 @@ int main() {
 			gear_up_pos[a] = upwai(a, gear_ben, game.gear.pity_count, game.gear.up_rate);
 		}
 	}
+	int genshin_fivestar_record[17] = { 41,45,5,84,38,76,81,80,11,62,56,76,76,14,39,80,46 };
+	int genshin_upfivestar_record[11] = { 41 + 45,5 + 84,38,76,81 + 80,11 + 62,56,76 + 76,14 + 39,80,46 };
+	int hongkai_fivestar_record[22] = { 38,77,57,77,35,79,79,18,38,10,77,73,1,2,78,77,18,50,82,76,74,78 };
+	int hongkai_upfivestar_record[14] = { 38 + 77,57,77 + 35,79 + 79,18 + 38,10 + 77,73,1 + 2,78 + 77,18,50,82 + 76,74,78 };
 	const int num_chars = NUM_CHAR;
 	const int num_gears = NUM_GEAR;
 	int max_numch = num_chars * 2 * game.character.pity_count;
@@ -327,7 +338,7 @@ int main() {
 	}
 	printf("game selected:%s\n", g[GAME].name);
 	printf("your targeted gacha goal:\n");
-	printf("character number:%d,gear number:%d\n",num_chars,num_gears);
+	printf("character number:%d,gear number:%d\n", num_chars, num_gears);
 	/*printf("characters:\n");
 	for (int i = 1; i <= max_numch; i++) {
 		printf("%d | %g\n", i, char_prob_dist[i]);
@@ -349,88 +360,13 @@ int main() {
 		printf("%d | %g\n", k, cum_total_prob[k]);
 	}
 	printf("---------------\nimportant points:\n");
-	for (int i = 1; i <= max_numch + max_numge; i++) {
-		if (cum_total_prob[i] >= 0.1) {
-			printf("10%% at:%d\n",i);
-			break;
-		}
-	}
-	for (int i = 1; i <= max_numch + max_numge; i++) {
-		if (cum_total_prob[i] >= 0.2) {
-			printf("20%% at:%d\n", i);
-			break;
-		}
-	}
-	for (int i = 1; i <= max_numch + max_numge; i++) {
-		if (cum_total_prob[i] >= 0.25) {
-			printf("25%% at:%d\n", i);
-			break;
-		}
-	}
-	for (int i = 1; i <= max_numch + max_numge; i++) {
-		if (cum_total_prob[i] >= 0.3) {
-			printf("30%% at:%d\n", i);
-			break;
-		}
-	}
-	for (int i = 1; i <= max_numch + max_numge; i++) {
-		if (cum_total_prob[i] >= 0.4) {
-			printf("40%% at:%d\n", i);
-			break;
-		}
-	}
-	for (int i = 1; i <= max_numch + max_numge; i++) {
-		if (cum_total_prob[i] >= 0.5) {
-			printf("50%% at:%d\n", i);
-			break;
-		}
-	}
-	for (int i = 1; i <= max_numch + max_numge; i++) {
-		if (cum_total_prob[i] >= 0.6) {
-			printf("60%% at:%d\n", i);
-			break;
-		}
-	}
-	for (int i = 1; i <= max_numch + max_numge; i++) {
-		if (cum_total_prob[i] >= 0.7) {
-			printf("70%% at:%d\n", i);
-			break;
-		}
-	}
-	for (int i = 1; i <= max_numch + max_numge; i++) {
-		if (cum_total_prob[i] >= 0.75) {
-			printf("75%% at:%d\n", i);
-			break;
-		}
-	}
-	for (int i = 1; i <= max_numch + max_numge; i++) {
-		if (cum_total_prob[i] >= 0.8) {
-			printf("80%% at:%d\n", i);
-			break;
-		}
-	}
-	for (int i = 1; i <= max_numch + max_numge; i++) {
-		if (cum_total_prob[i] >= 0.85) {
-			printf("85%% at:%d\n", i);
-			break;
-		}
-	}
-	for (int i = 1; i <= max_numch + max_numge; i++) {
-		if (cum_total_prob[i] >= 0.9) {
-			printf("90%% at:%d\n", i);
-			break;
-		}
-	}
-	for (int i = 1; i <= max_numch + max_numge; i++) {
-		if (cum_total_prob[i] >= 0.95) {
-			printf("95%% at:%d\n", i);
-			break;
-		}
-	}
-	for (int i = 1; i <= max_numch + max_numge; i++) {
-		if (cum_total_prob[i] >= 0.99) {
-			printf("99%% at:%d\n", i);
-			break;
+	double p_arr[] = {0.01,0.1,0.2,0.25,0.3,0.4,0.5,0.6,0.7,0.75,0.8,0.85,0.9,0.95,0.99};
+	for (int k = 0; k < length(p_arr); k++) {
+		for (int i = 1; i <= max_numch + max_numge; i++) {
+			if (cum_total_prob[i] >= p_arr[k]) {
+				printf("%.1lf%% at:%d\n", 100 * p_arr[k], i);
+				break;
+			}
 		}
 	}
 	printf("---------------\n");
@@ -472,6 +408,35 @@ int main() {
 	if (judge1 && judge2 && judge3) {
 		printf("1sigma:%lf 2sigma:%lf 3sigma:%lf\n", p1, p2, p3);
 		printf("reference value:1sigma,0.6826;2sigma,0.9544;3sigma,0.9974\n");
+	}
+	printf("--------------------\n");
+	printf("analysis for your record:\n");
+	double sum = 0.0; double average = 0.0;
+	if (GAME == GENSHIN_IMPACT && NUM_CHAR == 1) {
+		for (int i = 0; i < length(genshin_fivestar_record); i++) {
+			sum += char_cum[genshin_fivestar_record[i]];
+		}
+		average = sum / length(genshin_fivestar_record);
+		printf("fivestar total luck value:%lf/%d,average luck value:%lf\n", sum, length(genshin_fivestar_record), average);
+		sum = average = 0;
+		for (int i = 0; i < length(genshin_upfivestar_record); i++) {
+			sum += cum_char_prob[genshin_upfivestar_record[i]];
+		}
+		average = sum / length(genshin_upfivestar_record);
+		printf("upfivestar total luck value:%lf/%d,average luck value:%lf\n", sum, length(genshin_upfivestar_record), average);
+	}
+	if (GAME == HONGKAI_STARRAIL && NUM_CHAR == 1) {
+		for (int i = 0; i < length(hongkai_fivestar_record); i++) {
+			sum += char_cum[hongkai_fivestar_record[i]];
+		}
+		average = sum / length(hongkai_fivestar_record);
+		printf("fivestar total luck value:%lf/%d,average luck value:%lf\n", sum, length(hongkai_fivestar_record), average);
+		sum = average = 0;
+		for (int i = 0; i < length(hongkai_upfivestar_record); i++) {
+			sum += cum_char_prob[hongkai_upfivestar_record[i]];
+		}
+		average = sum / length(hongkai_upfivestar_record);
+		printf("upfivestar total luck value:%lf/%d,average luck value:%lf\n", sum, length(hongkai_upfivestar_record), average);
 	}
 	free(char_up_pos);
 	free(gear_up_pos);
