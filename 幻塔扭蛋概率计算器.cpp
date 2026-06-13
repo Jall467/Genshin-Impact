@@ -19,10 +19,10 @@ map<pair<int, int>, long double> memo;
 // 在这里修改停止条件逻辑
 function<bool(int)> stop_condition = [](int mask) {
     // 示例1：只抽到第一个物品（原问题）
-    // return (mask & 1);  // 第0位为1表示抽到第一个物品
+     return (mask & 1);  // 第0位为1表示抽到第一个物品
 
     // 示例2：抽到第一个和第二个物品
-    return (mask & 1) && (mask & 2) ;  // 第0位和第1位都为1
+    // return (mask & 1) && (mask & 2) ;  // 第0位和第1位都为1
 
     // 示例3：抽到任意指定物品
     // return (mask & 1) || (mask & 4);  // 抽到物品1或物品3
