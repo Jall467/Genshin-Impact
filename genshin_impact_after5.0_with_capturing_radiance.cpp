@@ -239,7 +239,7 @@ static void print_stats(const double* dist, int max_len) {
 
 int main(void) {
     printf("========================================\n");
-    printf("Calculator for Genshin Impact after 5.0:\n");
+    printf("Calculator espicially for Genshin Impact after 5.0:\n");
     printf("========================================\n");
     printf("targeted UP character num: %d\n", NUM_CHAR);
     printf("Capturing radiance init count: %d\n", CR_INIT);
@@ -268,7 +268,7 @@ int main(void) {
         NUM_CHAR, NUM_CHAR);
     for (int m = 0; m <= max_5star; m++) {
         if (P_5star[NUM_CHAR][m] > 1e-12)
-            printf("m=%2d | %.10g\n", m, P_5star[NUM_CHAR][m]);
+            printf("m = %2d | %.10g\n", m, P_5star[NUM_CHAR][m]);
     }
 
     // 第二层：复合
@@ -293,7 +293,7 @@ int main(void) {
 
     print_stats(char_dist, max_pull);
 
-    printf("\n=====percentages:=====\n");
+    printf("\n===== percentages: =====\n");
     double p_arr[] = { 0.01,0.05,0.1,0.2,0.25,0.3,0.4,0.5,0.6,0.7,0.75,0.8,0.85,0.9,0.95,0.99 };
     for (int k = 0; k < length(p_arr); k++) {
         for (int i = 1; i <= 180 * NUM_CHAR; i++) {
@@ -307,7 +307,7 @@ int main(void) {
     /* ---------- 武器池（可选） ---------- */
 #if CALC_GEAR
     printf("\n\n========================================\n");
-    printf("  武器池（5.0后定轨，命定值1）\n");
+    printf("  weapon banner(after 5.0)\n");
     printf("========================================\n");
     // TODO: 武器池定轨同样是状态相关，需要类似的二维DP
     // 这里先留空，需要时再实现
