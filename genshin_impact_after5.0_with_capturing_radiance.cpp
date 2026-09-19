@@ -239,7 +239,7 @@ static void print_stats(const double* dist, int max_len) {
 
 int main(void) {
     printf("========================================\n");
-    printf("Calculator espicially for Genshin Impact after 5.0:\n");
+    printf("Calculator for Genshin Impact after 5.0:\n");
     printf("========================================\n");
     printf("targeted UP character num: %d\n", NUM_CHAR);
     printf("Capturing radiance init count: %d\n", CR_INIT);
